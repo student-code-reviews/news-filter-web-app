@@ -102,10 +102,23 @@ def logout():
     return redirect("/")
 
 
-@app.route('/filtered-news/<user_id>')
-def filtered_news(user_id):
-    """Get filtered news based on the user's preferences"""
-    pass
+@app.route('/filtered-news')
+def triggering_news(trigger_word='trump'):
+    """Returns triggering news based on the keyword passed"""
+    all_articles = newsapi.get_everything(q='{}'.format(trigger_word),
+                                          sources='the-wall-street-journal',
+                                          from_param='2018-11-01',
+                                          to='2018-11-05',
+                                          language='en',
+                                          sort_by='relevancy',
+                                          page=2)
+    articles = all_articles['articles']
+
+    for article in articles:
+        title = article['title']
+        description = article['description']
+
+    return render_template('filtered_news.html', articles=articles)
 
 
 if __name__ == "__main__":
