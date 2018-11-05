@@ -103,7 +103,7 @@ def logout():
 
 
 @app.route('/filtered-news')
-def triggering_news(trigger_word='trump'):
+def triggering_news(trigger_word='assault'):
     """Returns triggering news based on the keyword passed"""
     all_articles = newsapi.get_everything(q='{}'.format(trigger_word),
                                           sources='the-wall-street-journal',
@@ -113,12 +113,12 @@ def triggering_news(trigger_word='trump'):
                                           sort_by='relevancy',
                                           page=2)
     articles = all_articles['articles']
+    if not articles:
+        result = 'No triggering news found.'
+    else:
+        result = 'Found following news'
 
-    for article in articles:
-        title = article['title']
-        description = article['description']
-
-    return render_template('filtered_news.html', articles=articles)
+    return render_template('filtered_news.html', result=result, articles=articles)
 
 
 if __name__ == "__main__":
