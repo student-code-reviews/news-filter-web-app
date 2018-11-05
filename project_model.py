@@ -1,11 +1,9 @@
 """ Models and database functions for project db """
 
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
-from flask_sqlalchemy import SQLalchemy
-# Here's where we create the idea of our database. We're getting this through
-# the Flask-SQLAlchemy library. On db, we can find the `session`
-# object, where we do most of our interactions (like committing, etc.)
-db = SQLalchemy
+db = SQLAlchemy()
 
 
 class User:
@@ -21,7 +19,7 @@ class User:
     def __repr__(self):
         """Provide useful output when printing."""
 
-        return "<User {username} user_id={user_id} triggers={}>".format(username=self.username, user_id=self.user_id, tirggers=self.triggers)
+        return "<User {username} user_id={user_id} triggers={}>".format(username=self.username, user_id=self.user_id, triggers=self.triggers)
 
 
 class News:
@@ -35,7 +33,7 @@ class News:
     def __repr__(self):
         """Provide useful output when printing."""
 
-        return "<News_id={} triggers={}>".format(news_id=self.news_id, self.trigger_words)
+        return "<News_id={} triggers={}>".format(news_id=self.news_id, triggers=self.trigger_words)
 
 
 # -------------------------------------------------------------------

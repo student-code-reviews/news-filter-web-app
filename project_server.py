@@ -1,13 +1,15 @@
-"""Movie Ratings."""
+"""Filtered News"""
 
 from jinja2 import StrictUndefined
 
 from flask import (Flask, render_template, redirect, request, flash, session)
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import User, Rating, Movie, connect_to_db, db
+from project_model import User, News, connect_to_db, db
 
 from newsapi import NewsApiClient
+
+import requests
 
 newsapi = NewsApiClient(api_key='f137fa32c38e47849487b4231fee31b0')
 
@@ -100,44 +102,10 @@ def logout():
     return redirect("/")
 
 
-@app.route('/rate-movie/<movie_id>', methods=['POST'])
-def movie_rated(movie_id):
-    """Checks to see if movie already rated and updates the rating"""
-
-    # The below rating is from the database. We are getting it by
-    # using the movie id and using the relationship between Movie
-    # and Rating classes.
-    rating = Rating.query.filter(Rating.movie_id == movie_id).first()
-
-    user_rating = request.form.get("movie_rating")
-
-    rating.score = user_rating
-
-    # The rating obtained from the form on log_in_movie_details:
-
-    # Checking if a rating already exists in the database:
-    db.session.add(rating)
-    db.session.commit()
-
-    return render_template("rating_confirmation.html")
-
-
 @app.route('/filtered-news/<user_id>')
-def filtered - news(user_id):
+def filtered_news(user_id):
     """Get filtered news based on the user's preferences"""
-
-    # Making a rating object using the user_id from the url.
-    rating = Rating.query.filter(Rating.user_id == user_id).first()
-    # Made a user object to access user details like age and zipcode.
-    user = rating.user
-    # Made a movie object to access movie title.
-    movie = rating.movie
-
-    return render_template("user_details.html",
-                           age=user.age,
-                           zipcode=user.zipcode,
-                           movies=movie.title,
-                           movie_score=rating.score)
+    pass
 
 
 if __name__ == "__main__":
