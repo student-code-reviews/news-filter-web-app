@@ -48,7 +48,7 @@ def register_form():
         user_email = request.form.get("email")
         user_password = request.form.get("password")
         # Trigger_words is a string.
-        trigger_words = reqest.form.get("trigger_words")
+        trigger_words = request.form.get("trigger_words")
 
         user_list = db.session.query(User.email).all()
 
@@ -123,7 +123,7 @@ def headlines():
     return render_template('headlines.html', result=result, articles=headlines)
 
 
-@app.route('/filterednews', methods=['POST'])
+@app.route('/filtered-news', methods=['POST'])
 def filterednews():
     """Returns triggering news based on the keyword passed"""
     news_type = request.form.get("option")
