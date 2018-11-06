@@ -47,13 +47,13 @@ def register_form():
     else:
         user_email = request.form.get("email")
         user_password = request.form.get("password")
-        # Trigger_words is a string.
-        trigger_words = request.form.get("trigger_words")
+        # Trigger_words is a string. For now, it is only one word.
+        trigger_word = request.form.get("trigger_word")
 
         user_list = db.session.query(User.email).all()
 
         if user_email not in user_list:
-            new_user = User(email=user_email, password=user_password, triggers=trigger_words)
+            new_user = User(email=user_email, password=user_password, trigger=trigger_word)
             db.session.add(new_user)
             db.session.commit()
 
@@ -84,7 +84,7 @@ def logged_in():
     # Otherwise, the login page is rendered again.
     if user_check:
         session['user'] = email
-        # User id is saved in this varianble.
+        # User id is saved in this variable.
         user_id = int(user.user_id)
         flash("You have successfully logged in!")
         return redirect(f"filtered-news/{user_id}")
@@ -124,16 +124,41 @@ def headlines():
 
 
 @app.route('/filtered-news', methods=['POST'])
-def filterednews():
+def filterednews(email='krits@gmail.com'):
     """Returns triggering news based on the keyword passed"""
     news_type = request.form.get("option")
     app.logger.info(news_type)
+
+    # Making a user object to access trigger word for that user.
+    user = User.query.filter(User.email == email).one()
+    trigger_word = user.trigger
+
+    # Based on user's preference of news section, providing section news.
     if news_type == 'world':
         news = 'world'
-        trigger_word = 'trump'
+    elif news_type == 'technology':
+        news = 'technology'
+    elif news_type == 'politics':
+        news = 'politics'
+    elif news_type == 'entertainment':
+        news = 'entertainment'
+    elif news_type == 'sports':
+        news = 'sports'
     else:
-        trigger_word = 'trump'
-    all_articles = newsapi.get_everything(q='+{}'.format(trigger_word),
+        # For headlines
+        top_headlines = newsapi.get_top_headlines(q='-{}'.format(trigger_word),
+                                                  country='us',
+                                                  language='en')
+        headlines = top_headlines['articles']
+        if not headlines:
+            # This is when an empty list of news is returned after API request
+            result = 'No headlines found.'
+        else:
+            result = 'Found following news:'
+        return render_template('headlines.html', result=result, articles=headlines)
+
+    # This is for all articles in a perticular section without news with user's trigger word
+    all_articles = newsapi.get_everything(q='-{}, {}'.format(trigger_word, news),
                                           sources='the-wall-street-journal',
                                           from_param='2018-10-05',
                                           to='2018-11-05',

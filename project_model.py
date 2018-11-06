@@ -6,23 +6,23 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-class User:
+class User(db.Model):
     """ User's details like username, password and triggering workds"""
 
     __tablename__ = 'users'
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    username = db.Column(db.String(50), nullable=True)
+    email = db.Column(db.String(50), nullable=True)
     password = db.Column(db.String(50), nullable=True)
-    triggers = db.Column(db.String(100), nullable=False)
+    trigger = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
         """Provide useful output when printing."""
 
-        return "<User {username} user_id={user_id} triggers={}>".format(username=self.username, user_id=self.user_id, triggers=self.triggers)
+        return "<User {} user_id={} triggers={}>".format(username=self.email, user_id=self.user_id, trigger=self.trigger)
 
 
-class News:
+class News(db.Model):
     """ News with news id. """
 
     __tablename__ = 'news'
@@ -53,7 +53,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our database.
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///news'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///filterednews'
     app.config['SQLALCHEMY_ECHO'] = False
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
