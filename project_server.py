@@ -123,8 +123,8 @@ def headlines():
     return render_template('headlines.html', result=result, articles=headlines)
 
 
-@app.route('/filtered-news', methods=['POST'])
-def filterednews(email='krits@gmail.com'):
+@app.route('/filtered-news/<user_id>', methods=['POST'])
+def filterednews():
     """Returns triggering news based on the keyword passed"""
     news_type = request.form.get("option")
     app.logger.info(news_type)

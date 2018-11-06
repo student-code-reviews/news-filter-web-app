@@ -46,6 +46,7 @@ def init_app():
     app = Flask(__name__)
 
     connect_to_db(app)
+    db.create_all()
     print("Connected to DB.")
 
 
@@ -54,10 +55,15 @@ def connect_to_db(app):
 
     # Configure to use our database.
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///filterednews'
-    app.config['SQLALCHEMY_ECHO'] = False
+    app.config['SQLALCHEMY_ECHO'] = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)
+
+    # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///ratings'
+    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # db.app = app
+    # db.init_app(app)
 
 
 if __name__ == "__main__":
