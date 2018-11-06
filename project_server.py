@@ -87,7 +87,7 @@ def logged_in():
         # User id is saved in this variable.
         user_id = int(user.user_id)
         flash("You have successfully logged in!")
-        return redirect(f"filtered-news/{user_id}")
+        return redirect(f"news-options/{user_id}")
     else:
         return redirect("/login")
 
@@ -102,35 +102,36 @@ def logout():
     return redirect("/")
 
 
-@app.route('/news-options')
-def news_options():
+@app.route('/news-options/<user_id>')
+def news_options(user_id):
     """ This displays a page with following news options- world, technology, politics, entertainment"""
+    app.logger.info(type(user_id))
+    return render_template('news_options.html', user_id=user_id)
 
-    return render_template('news_options.html')
 
-
-@app.route('/headlines', methods=['POST'])
-def headlines():
-    top_headlines = newsapi.get_top_headlines(q='',
-                                              sources='bbc-news,the-verge',
-                                              language='en')
-    headlines = top_headlines['articles']
-    if not headlines:
-        # This is when an empty list of news is returned after API request
-        result = 'No headlines found.'
-    else:
-        result = 'Found following news:'
-    return render_template('headlines.html', result=result, articles=headlines)
+# @app.route('/headlines', methods=['POST'])
+# def headlines():
+#     top_headlines = newsapi.get_top_headlines(q='',
+#                                               sources='bbc-news,the-verge',
+#                                               language='en')
+#     headlines = top_headlines['articles']
+#     if not headlines:
+#         # This is when an empty list of news is returned after API request
+#         result = 'No headlines found.'
+#     else:
+#         result = 'Found following news:'
+#     return render_template('headlines.html', result=result, articles=headlines)
 
 
 @app.route('/filtered-news/<user_id>', methods=['POST'])
-def filterednews():
+def filterednews(user_id):
     """Returns triggering news based on the keyword passed"""
+
     news_type = request.form.get("option")
     app.logger.info(news_type)
 
     # Making a user object to access trigger word for that user.
-    user = User.query.filter(User.email == email).one()
+    user = User.query.get('{}'.format(user_id))
     trigger_word = user.trigger
 
     # Based on user's preference of news section, providing section news.
