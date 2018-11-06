@@ -130,7 +130,6 @@ def filterednews(user_id):
     """Returns triggering news based on the keyword passed"""
 
     news_type = request.form.get("option")
-    app.logger.info(news_type)
 
     # Making a user object to access trigger word for that user.
     user = User.query.get('{}'.format(user_id))
@@ -139,14 +138,19 @@ def filterednews(user_id):
     # Based on user's preference of news section, providing section news.
     if news_type == 'world':
         news = 'world'
+        sources = 'the-hindu, bbc-news, the-new-york'
     elif news_type == 'technology':
         news = 'technology'
+        sources = 'techcrunch, techradar, the-verge, hacker-news'
     elif news_type == 'politics':
         news = 'politics'
+        sources = 'politico'
     elif news_type == 'entertainment':
         news = 'entertainment'
+        sources = 'entertainment-weekly'
     elif news_type == 'sports':
         news = 'sports'
+        sources = 'espn, fox-sports'
     else:
         # For headlines
         top_headlines = newsapi.get_top_headlines(q='',
@@ -161,8 +165,9 @@ def filterednews(user_id):
         return render_template('headlines.html', result=result, articles=headlines)
 
     # This is for all articles in a perticular section without news with user's trigger word
-    all_articles = newsapi.get_everything(q=f'-trump',
-                                          sources='the-hindu',
+
+    all_articles = newsapi.get_everything(q=f'-{trigger_word}',
+                                          sources=sources,
                                           from_param=f'{date.today()}',
                                           to=f'{date.today()}',
                                           language='en',
@@ -175,7 +180,16 @@ def filterednews(user_id):
     else:
         result = 'Found following news'
 
-    return render_template('filtered_news.html', result=result, articles=articles)
+    return render_template('filtered_news.html', result=result, articles=articles, news=news, user_id=user_id)
+
+
+@app.route('/trigger-tagged-news/<user_id>', methods=['POST'])
+def trigger_tagging_news(user_id):
+    """Returns triggering news based on the keyword passed"""
+
+    triggering_article = request.form.get("trigger_article")
+    app.logger.info(triggering_article)
+    return render_template('triggered.html')
 
 
 if __name__ == "__main__":
