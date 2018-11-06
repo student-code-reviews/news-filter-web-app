@@ -102,18 +102,47 @@ def logout():
     return redirect("/")
 
 
-@app.route('/filtered-news')
-def triggering_news(trigger_word='assault'):
+@app.route('/news-options')
+def news_options():
+    """ This displays a page with following news options- world, technology, politics, entertainment"""
+
+    return render_template('news_options.html')
+
+
+@app.route('/headlines', methods=['POST'])
+def headlines():
+    top_headlines = newsapi.get_top_headlines(q='',
+                                              sources='bbc-news,the-verge',
+                                              language='en')
+    headlines = top_headlines['articles']
+    if not headlines:
+        # This is when an empty list of news is returned after API request
+        result = 'No headlines found.'
+    else:
+        result = 'Found following news:'
+    return render_template('headlines.html', result=result, articles=headlines)
+
+
+@app.route('/filterednews', methods=['POST'])
+def filterednews():
     """Returns triggering news based on the keyword passed"""
-    all_articles = newsapi.get_everything(q='{}'.format(trigger_word),
+    news_type = request.form.get("option")
+    app.logger.info(news_type)
+    if news_type == 'world':
+        news = 'world'
+        trigger_word = 'trump'
+    else:
+        trigger_word = 'trump'
+    all_articles = newsapi.get_everything(q='+{}'.format(trigger_word),
                                           sources='the-wall-street-journal',
-                                          from_param='2018-11-01',
+                                          from_param='2018-10-05',
                                           to='2018-11-05',
                                           language='en',
                                           sort_by='relevancy',
                                           page=2)
     articles = all_articles['articles']
     if not articles:
+        # This is when an empty list of news is returned after API request
         result = 'No triggering news found.'
     else:
         result = 'Found following news'
