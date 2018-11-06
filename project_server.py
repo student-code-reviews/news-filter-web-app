@@ -11,6 +11,8 @@ from newsapi import NewsApiClient
 
 import requests
 
+from datetime import date
+
 newsapi = NewsApiClient(api_key='f137fa32c38e47849487b4231fee31b0')
 
 app = Flask(__name__)
@@ -147,8 +149,8 @@ def filterednews(user_id):
         news = 'sports'
     else:
         # For headlines
-        top_headlines = newsapi.get_top_headlines(q='-{}'.format(trigger_word),
-                                                  country='us',
+        top_headlines = newsapi.get_top_headlines(q='',
+                                                  sources='the-wall-street-journal',
                                                   language='en')
         headlines = top_headlines['articles']
         if not headlines:
@@ -159,10 +161,10 @@ def filterednews(user_id):
         return render_template('headlines.html', result=result, articles=headlines)
 
     # This is for all articles in a perticular section without news with user's trigger word
-    all_articles = newsapi.get_everything(q='-{}, {}'.format(trigger_word, news),
-                                          sources='the-wall-street-journal',
-                                          from_param='2018-10-05',
-                                          to='2018-11-05',
+    all_articles = newsapi.get_everything(q=f'-trump',
+                                          sources='the-hindu',
+                                          from_param=f'{date.today()}',
+                                          to=f'{date.today()}',
                                           language='en',
                                           sort_by='relevancy',
                                           page=2)
