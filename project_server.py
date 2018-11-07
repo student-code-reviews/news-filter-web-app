@@ -185,11 +185,26 @@ def filterednews(user_id):
 
 @app.route('/trigger-tagged-news/<user_id>', methods=['POST'])
 def trigger_tagging_news(user_id):
-    """Returns triggering news based on the keyword passed"""
+    """Gets the title of triggering article and returns a page with triggering words. """
 
     triggering_article = request.form.get("trigger_article")
     app.logger.info(triggering_article)
-    return render_template('triggered.html')
+    return render_template('triggered.html', triggering_article=triggering_article)
+
+
+@app.route('/trigger-submitted/<triggering_article>', methods=['POST'])
+def trigger_tagging(triggering_article):
+    """Adds the triggering article and trigger word associated with it to the db"""
+
+    # Checking LL
+    triggering_news = db.session.query(News.triggering_article).all()
+    if triggering_article not in triggering_news:
+        trigger_words = request.form.get("trigger_words")
+        new_triggering_article = News(triggering_article=triggering_article, trigger_words=trigger_words)
+        db.session.add(new_triggering_article)
+        db.session.commit()
+
+    return render_template('trigger_submitted.html')
 
 
 if __name__ == "__main__":

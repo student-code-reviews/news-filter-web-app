@@ -28,6 +28,7 @@ class News(db.Model):
     __tablename__ = 'news'
 
     news_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    triggering_article = db.Column(db.String(200), nullable=False)
     trigger_words = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
