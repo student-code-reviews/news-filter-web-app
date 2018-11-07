@@ -1,13 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1>Filtered News</h1>
+  <h2>Filtered News options</h2>
+  <p>
+    <form action=" \filtered-news\{{user_id}}" method="POST">
+        <input type="radio" name="option" value="headlines">Headlines
+        <input type="radio" name="option" value="world">World
+        <input type="radio" name="option" value="technology">Technology
+        <input type="radio" name="option" value="politics">Politics
+        <input type="radio" name="option" value="entertainment">Entertainment
+        <input type="radio" name="option" value="sports">Sports
 
-<p><b><a href="/register">Register</a></p>
-
-<p><b><a href="/login">Log In</a></p>
-
-<p><b><a href="/logout">Log Out</a></p>
-
-
+        <button type="submit">Read News!</button>
+    </form>
+  </p>
+  <footer> <a href='/logout'>Logout</a></footer>
 {% endblock %}

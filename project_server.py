@@ -1,5 +1,6 @@
 """Filtered News"""
-
+# Please note that the word trigger itself can elicit negative feelings. To address this,
+# I have used only letter t
 from jinja2 import StrictUndefined
 
 from flask import (Flask, render_template, redirect, request, flash, session)
@@ -32,7 +33,9 @@ def index():
 
 # Here, we are checking if the user is logged in (session has 'user' key)
     if 'user' in session:
-        return render_template("log_in_homepage.html")
+        user = User.query.filter(User.email == session['user']).one()
+        user_id = int(user.user_id)
+        return render_template("log_in_homepage.html", user_id=user_id)
     else:
         return render_template("homepage.html")
 
@@ -49,13 +52,13 @@ def register_form():
     else:
         user_email = request.form.get("email")
         user_password = request.form.get("password")
-        # Trigger_words is a string. For now, it is only one word.
-        trigger_word = request.form.get("trigger_word")
+        # tr_words is a string. For now, it is only one word.
+        trig_word = request.form.get("trig_word")
 
         user_list = db.session.query(User.email).all()
 
         if user_email not in user_list:
-            new_user = User(email=user_email, password=user_password, trigger=trigger_word)
+            new_user = User(email=user_email, password=user_password, trig=trig_word)
             db.session.add(new_user)
             db.session.commit()
 
@@ -82,7 +85,7 @@ def logged_in():
     # Checking to see if the password matches for the email provided by the user.
     user_check = User.query.filter(User.email == email, User.password == password).all()
 
-    # If the check works for the email and matching password, user details page is rendered.
+    # If the check works for the email and matching password, news options page is rendered.
     # Otherwise, the login page is rendered again.
     if user_check:
         session['user'] = email
@@ -111,97 +114,68 @@ def news_options(user_id):
     return render_template('news_options.html', user_id=user_id)
 
 
-# @app.route('/headlines', methods=['POST'])
-# def headlines():
-#     top_headlines = newsapi.get_top_headlines(q='',
-#                                               sources='bbc-news,the-verge',
-#                                               language='en')
-#     headlines = top_headlines['articles']
-#     if not headlines:
-#         # This is when an empty list of news is returned after API request
-#         result = 'No headlines found.'
-#     else:
-#         result = 'Found following news:'
-#     return render_template('headlines.html', result=result, articles=headlines)
-
-
 @app.route('/filtered-news/<user_id>', methods=['POST'])
 def filterednews(user_id):
-    """Returns triggering news based on the keyword passed"""
+    """Returns triggering news based on the user's preferences """
 
     news_type = request.form.get("option")
 
     # Making a user object to access trigger word for that user.
     user = User.query.get('{}'.format(user_id))
-    trigger_word = user.trigger
-
+    trig_word = user.trig
+    topic = ''
     # Based on user's preference of news section, providing section news.
     if news_type == 'world':
-        news = 'world'
-        sources = 'the-hindu, bbc-news, the-new-york'
+        domains = 'thehindu.com, bbc.co.uk, nytimes.com'
     elif news_type == 'technology':
-        news = 'technology'
-        sources = 'techcrunch, techradar, the-verge, hacker-news'
+        domains = 'techcrunch.com, theverge.com, hackernews.com'
     elif news_type == 'politics':
-        news = 'politics'
-        sources = 'politico'
+        domains = 'politico.com'
     elif news_type == 'entertainment':
-        news = 'entertainment'
-        sources = 'entertainment-weekly'
-    elif news_type == 'sports':
-        news = 'sports'
-        sources = 'espn, fox-sports'
+        domains = 'ew.com'
     else:
-        # For headlines
-        top_headlines = newsapi.get_top_headlines(q='',
-                                                  sources='the-wall-street-journal',
-                                                  language='en')
-        headlines = top_headlines['articles']
-        if not headlines:
-            # This is when an empty list of news is returned after API request
-            result = 'No headlines found.'
-        else:
-            result = 'Found following news:'
-        return render_template('headlines.html', result=result, articles=headlines)
+        sources = 'espn'
+        domains = 'espn.com'
 
-    # This is for all articles in a perticular section without news with user's trigger word
-
-    all_articles = newsapi.get_everything(q=f'-{trigger_word}',
-                                          sources=sources,
+    all_articles = newsapi.get_everything(q=f'-{trig_word}',
+                                          domains=domains,
                                           from_param=f'{date.today()}',
                                           to=f'{date.today()}',
-                                          language='en',
-                                          sort_by='relevancy',
-                                          page=2)
+                                          language='en')
+
     articles = all_articles['articles']
     if not articles:
         # This is when an empty list of news is returned after API request
-        result = 'No triggering news found.'
+        result = 'No news found.'
     else:
-        result = 'Found following news'
+        result = "Today's news"
 
-    return render_template('filtered_news.html', result=result, articles=articles, news=news, user_id=user_id)
-
-
-@app.route('/trigger-tagged-news/<user_id>', methods=['POST'])
-def trigger_tagging_news(user_id):
-    """Gets the title of triggering article and returns a page with triggering words. """
-
-    triggering_article = request.form.get("trigger_article")
-    app.logger.info(triggering_article)
-    return render_template('triggered.html', triggering_article=triggering_article)
+    return render_template('filtered_news.html', user=user, result=result, articles=articles, news=news_type, user_id=user_id)
 
 
-@app.route('/trigger-submitted/<triggering_article>', methods=['POST'])
-def trigger_tagging(triggering_article):
+@app.route('/trig-tagged-news/<user_id>', methods=['POST'])
+def trig_tagging_news(user_id):
+    """Gets the title of triggering article and returns a page with a list of
+    triggering words that the user can choose from. """
+
+    trig_article = request.form.get("trig_article")
+    app.logger.info(trig_article)
+    return render_template('triggered.html', trig_article=trig_article)
+
+
+@app.route('/trig-submitted/<trig_article>', methods=['POST'])
+def trig_tagging(trig_article):
     """Adds the triggering article and trigger word associated with it to the db"""
 
-    # Checking LL
-    triggering_news = db.session.query(News.triggering_article).all()
-    if triggering_article not in triggering_news:
-        trigger_words = request.form.get("trigger_words")
-        new_triggering_article = News(triggering_article=triggering_article, trigger_words=trigger_words)
-        db.session.add(new_triggering_article)
+    # Getting a list of news objects:
+    trig_news = db.session.query(News.trig_article).all()
+
+    # Checking if triggering article is already in the database. If it isn't,
+    # adding the article to the news table.
+    if trig_article not in trig_news:
+        trig_words = request.form.get("trig_words")
+        new_trig_article = News(trig_article=trig_article, trig_words=trig_words)
+        db.session.add(new_trig_article)
         db.session.commit()
 
     return render_template('trigger_submitted.html')

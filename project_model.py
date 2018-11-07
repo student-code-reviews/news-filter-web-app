@@ -14,12 +14,12 @@ class User(db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(50), nullable=True)
     password = db.Column(db.String(50), nullable=True)
-    trigger = db.Column(db.String(100), nullable=False)
+    trig = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
         """Provide useful output when printing."""
 
-        return "<User {} user_id={} triggers={}>".format(username=self.email, user_id=self.user_id, trigger=self.trigger)
+        return "<User {} user_id={} triggers={}>".format(username=self.email, user_id=self.user_id, trigger=self.trig)
 
 
 class News(db.Model):
@@ -28,13 +28,13 @@ class News(db.Model):
     __tablename__ = 'news'
 
     news_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    triggering_article = db.Column(db.String(200), nullable=False)
-    trigger_words = db.Column(db.String(100), nullable=False)
+    trig_article = db.Column(db.String(200), nullable=False)
+    trig_words = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
         """Provide useful output when printing."""
 
-        return "<News_id={} triggers={}>".format(news_id=self.news_id, triggers=self.trigger_words)
+        return "<News_id={} triggers={}>".format(news_id=self.news_id, triggers=self.trig_words)
 
 
 # -------------------------------------------------------------------

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-  <h2>To register, please provide your email address, create a password and trigger words to filter news. </h2>
+  <h2>To register, please provide your email address, password and news filtering preferences</h2>
 
   <form action = '/register' method='POST' >
     Email address:<br>
@@ -11,12 +11,12 @@
     <input type="text" name="password">
     <br><br>
     Trigger words:
-     <select name="trigger_word">
-      <option value="rape">Rape</option>
+     <select name="trig_word">
+      <option value="rape">Ra**</option>
       <option value="war">War</option>
-      <option value="crash">Crash</option>
-      <option value="assault">Assault</option>
-      <!-- <option value="trump">Trump</option> -->
+      <option value="crash">Cr**h</option>
+      <option value="assault">Ass**lt</option>
+      <option value="trump">Tr**p</option>
     </select>
     <br><br>
     <input type="submit" value="Submit">
