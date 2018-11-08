@@ -110,20 +110,28 @@ def logout():
 @app.route('/news-options/<user_id>')
 def news_options(user_id):
     """ This displays a page with following news options- world, technology, politics, entertainment"""
-    app.logger.info(type(user_id))
     return render_template('news_options.html', user_id=user_id)
+
+# This is where bulk of the back-end work is happening...
 
 
 @app.route('/filtered-news/<user_id>', methods=['POST'])
 def filterednews(user_id):
     """Returns triggering news based on the user's preferences """
 
+    # Below is a request to get the type of news the user has selected to read.
     news_type = request.form.get("option")
-
     # Making a user object to access trigger word for that user.
     user = User.query.get('{}'.format(user_id))
     trig_word = user.trig
-    topic = ''
+
+    # Getting list of all triggering news objects from news table.
+    trig_news = News.query.all()
+    trig_news_keywords = []
+    # Getting a list of triggering news titles.
+    for item in trig_news:
+        trig_news_keywords.append(item.trig_article)
+
     # Based on user's preference of news section, providing section news.
     if news_type == 'world':
         domains = 'thehindu.com, bbc.co.uk, nytimes.com'
@@ -137,6 +145,7 @@ def filterednews(user_id):
         sources = 'espn'
         domains = 'espn.com'
 
+    # Sending request to News API below:
     all_articles = newsapi.get_everything(q=f'-{trig_word}',
                                           domains=domains,
                                           from_param=f'{date.today()}',
@@ -144,6 +153,7 @@ def filterednews(user_id):
                                           language='en')
 
     articles = all_articles['articles']
+
     if not articles:
         # This is when an empty list of news is returned after API request
         result = 'No news found.'
@@ -159,7 +169,6 @@ def trig_tagging_news(user_id):
     triggering words that the user can choose from. """
 
     trig_article = request.form.get("trig_article")
-    app.logger.info(trig_article)
     return render_template('triggered.html', trig_article=trig_article)
 
 
@@ -168,7 +177,7 @@ def trig_tagging(trig_article):
     """Adds the triggering article and trigger word associated with it to the db"""
 
     # Getting a list of news objects:
-    trig_news = db.session.query(News.trig_article).all()
+    trig_news = News.query.all()
 
     # Checking if triggering article is already in the database. If it isn't,
     # adding the article to the news table.

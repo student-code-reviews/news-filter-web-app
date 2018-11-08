@@ -34,7 +34,7 @@ class News(db.Model):
     def __repr__(self):
         """Provide useful output when printing."""
 
-        return "<News_id={} triggers={}>".format(news_id=self.news_id, triggers=self.trig_words)
+        return f"<News_id={self.news_id} triggers={self.trig_words}>"
 
 
 # -------------------------------------------------------------------
@@ -56,7 +56,7 @@ def connect_to_db(app):
 
     # Configure to use our database.
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///filterednews'
-    app.config['SQLALCHEMY_ECHO'] = True
+    app.config['SQLALCHEMY_ECHO'] = False
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)
