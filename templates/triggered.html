@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+
+  <h2>Oops! Sorry you didn't like that article</h2>
+  <p>
+        Article Tite: {{trig_article}}
+        <form action = '/trig-submitted/{{trig_article}}' method='POST' >
+        Please select associated triggering tag:<br>
+        <input type = 'checkbox' name="trig_words" value="rape">R**e<br>
+        <input type = 'checkbox' name="trig_words" value="war">War<br>
+        <input type = 'checkbox' name="trig_words" value="crash">Cr**h<br>
+        <input type = 'checkbox' name="trig_words" value="assault">As***lt<br>
+        <input type = 'checkbox' name="trig_words" value="trump">Tr**p<br><br>
+
+      <input type="submit" value="Submit">
+    </form>
+  </p>
+{% endblock %}
+
+<!-- {{ url_for('filterednews') }} -->

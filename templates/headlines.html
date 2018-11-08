@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+
+  <h2>Headlines for today...</h2>
+    <p>
+      {{result}}<br>
+
+        {% for article in articles %}
+          Title: {{article.title}} <br>
+          Description: {{article.description}}<br>
+          URL: {{article.url}}<br>
+          <img src={{article.urlToImage}}><br><br>
+        {% endfor %}
+
+    </p>
+
+{% endblock %}

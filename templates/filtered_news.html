@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+
+  <h2>Filtered news for {{news}}...</h2>
+    <p>
+      {{result}}<br>
+
+
+        {% for article in articles %}
+          Title: {{article.title}} <br>
+          Description: {{article.description}}<br>
+          URL: {{article.url}}<br>
+          <img src={{article.urlToImage}} style = 'width:100px; height:100px;border:0;'> <br>
+          <form action=" \trig-tagged-news\{{user_id}}" method="POST">
+            <button type="submit" name="trig_article" value="{{article.title}}">Triggering News</button>
+            <br><br><br>
+          </form>
+        {% endfor %}
+
+    </p>
+
+{% endblock %}
