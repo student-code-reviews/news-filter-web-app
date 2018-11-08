@@ -30,6 +30,7 @@ class News(db.Model):
     news_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     trig_article = db.Column(db.String(200), nullable=False)
     trig_words = db.Column(db.String(100), nullable=False)
+    date_added = db.Column(db.String(15), nullable=False)
 
     def __repr__(self):
         """Provide useful output when printing."""

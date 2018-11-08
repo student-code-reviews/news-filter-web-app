@@ -125,13 +125,7 @@ def filterednews(user_id):
     user = User.query.get('{}'.format(user_id))
     trig_word = user.trig
 
-    # Getting list of all triggering news objects from news table.
-    trig_news = News.query.all()
-    trig_news_keywords = []
-    # Getting a list of triggering news titles.
-    for item in trig_news:
-        trig_news_keywords.append(item.trig_article)
-
+# *****************************************************************************
     # Based on user's preference of news section, providing section news.
     if news_type == 'world':
         domains = 'thehindu.com, bbc.co.uk, nytimes.com'
@@ -152,15 +146,36 @@ def filterednews(user_id):
                                           to=f'{date.today()}',
                                           language='en')
 
+    # This is a list of articles objects from the json response returned.
     articles = all_articles['articles']
+# *****************************************************************************
 
+    # Getting list of all triggering news objects from news table.
+    trig_news = News.query.all()
+
+    # Making a set of triggering news article titles below
+    trig_news_titles = set()
+    for trig_title in trig_news:
+        trig_news_titles.add(trig_title)
+# *****************************************************************************
     if not articles:
         # This is when an empty list of news is returned after API request
         result = 'No news found.'
     else:
         result = "Today's news"
 
-    return render_template('filtered_news.html', user=user, result=result, articles=articles, news=news_type, user_id=user_id)
+    # Filtering news by selecting articles that do not have the triggering title.
+        filtered_articles = []
+        for article in articles:
+            if article.title not in trig_news_titles
+                filtered_articles.append(article)
+# *****************************************************************************
+    return render_template('filtered_news.html',
+                           user=user,
+                           result=result,
+                           articles=filtered_articles,
+                           news=news_type,
+                           user_id=user_id)
 
 
 @app.route('/trig-tagged-news/<user_id>', methods=['POST'])
@@ -183,7 +198,9 @@ def trig_tagging(trig_article):
     # adding the article to the news table.
     if trig_article not in trig_news:
         trig_words = request.form.get("trig_words")
-        new_trig_article = News(trig_article=trig_article, trig_words=trig_words)
+        new_trig_article = News(trig_article=trig_article,
+                                trig_words=trig_words,
+                                date_added=date.today())
         db.session.add(new_trig_article)
         db.session.commit()
 
