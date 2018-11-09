@@ -1,0 +1,4 @@
+source env/bin/activate
+source secrets.sh
+python3 project_server.py
+
