@@ -2,7 +2,7 @@
 # Please note that the word trigger itself can elicit negative feelings. To address this,
 # I have used only letter t
 from jinja2 import StrictUndefined
-
+import os
 from flask import (Flask, render_template, redirect, request, flash, session)
 from flask_debugtoolbar import DebugToolbarExtension
 
@@ -14,7 +14,7 @@ import requests
 
 from datetime import date
 
-newsapi = NewsApiClient(api_key='f137fa32c38e47849487b4231fee31b0')
+newsapi = NewsApiClient(api_key=os.environ.get('MY_KEY_NAME'))
 
 app = Flask(__name__)
 
@@ -164,13 +164,19 @@ def get_articles(news_type, trig_word):
 
 
 def filtering_news(articles):
+    """ Make new list of filtered articles by removing articles from the bannednews table. """
+
+    # Making a set of banned news titles.
+    banned_news = BannedNews.query.all()
+    banned_titles = set()
+    for item in banned_news:
+        banned_titles.add(item.trig_article)
 
     # Filtering news by selecting articles that do not have the triggering title.
     if BannedNews:
         filtered_articles = []
         for article in articles:
-            app.logger.info(article)
-            if article['title'] not in BannedNews.query.filter(BannedNews.trig_article == article['title']).all():
+            if article['title'] not in banned_titles:
                 filtered_articles.append(article)
     else:
         filtered_articles = articles
