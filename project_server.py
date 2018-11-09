@@ -6,7 +6,7 @@ from jinja2 import StrictUndefined
 from flask import (Flask, render_template, redirect, request, flash, session)
 from flask_debugtoolbar import DebugToolbarExtension
 
-from project_model import User, News, connect_to_db, db
+from project_model import User, BannedNews, connect_to_db, db
 
 from newsapi import NewsApiClient
 
@@ -100,7 +100,6 @@ def logged_in():
 @app.route('/logout')
 def logout():
     """Logged out and session cleared."""
-
 # This is how you clear a session. Very important when logging out.
     session.clear()
     flash("Logged out!")
@@ -112,32 +111,45 @@ def news_options(user_id):
     """ This displays a page with following news options- world, technology, politics, entertainment"""
     return render_template('news_options.html', user_id=user_id)
 
+
 # This is where bulk of the back-end work is happening...
-
-
 @app.route('/filtered-news/<user_id>', methods=['POST'])
-def filterednews(user_id):
-    """Returns triggering news based on the user's preferences """
-
+def userpreferences(user_id):
+    """Gets user's preference of news and makes a query to get user's trigger words """
     # Below is a request to get the type of news the user has selected to read.
     news_type = request.form.get("option")
+
     # Making a user object to access trigger word for that user.
     user = User.query.get('{}'.format(user_id))
     trig_word = user.trig
 
-# *****************************************************************************
-    # Based on user's preference of news section, providing section news.
-    if news_type == 'world':
-        domains = 'thehindu.com, bbc.co.uk, nytimes.com'
-    elif news_type == 'technology':
-        domains = 'techcrunch.com, theverge.com, hackernews.com'
-    elif news_type == 'politics':
-        domains = 'politico.com'
-    elif news_type == 'entertainment':
-        domains = 'ew.com'
+    # Calling get_articles function that sends an API request.
+    filtered_articles = get_articles(news_type, trig_word)
+
+    if not filtered_articles:
+        # This is when an empty list of news is returned after API request
+        result = 'No news found.'
     else:
-        sources = 'espn'
-        domains = 'espn.com'
+        result = "Today's news"
+
+    return render_template('filtered_news.html',
+                           user=user,
+                           result=result,
+                           articles=filtered_articles,
+                           news=news_type,
+                           user_id=user_id)
+
+
+def get_articles(news_type, trig_word):
+    """ Sends a request to NewsAPI with user's trigger words and preference for type of news."""
+    # Based on user's preference of news section, providing section news.
+    news_options = {'world': 'bbc.co.uk',
+                    'technology': 'techcrunch.com, theverge.com, hackernews.com',
+                    'politics': 'politico.com',
+                    'entertainment': 'ew.com',
+                    'sports': 'espn.com'}
+
+    domains = news_options[news_type]
 
     # Sending request to News API below:
     all_articles = newsapi.get_everything(q=f'-{trig_word}',
@@ -148,34 +160,22 @@ def filterednews(user_id):
 
     # This is a list of articles objects from the json response returned.
     articles = all_articles['articles']
-# *****************************************************************************
+    return filtering_news(articles)
 
-    # Getting list of all triggering news objects from news table.
-    trig_news = News.query.all()
 
-    # Making a set of triggering news article titles below
-    trig_news_titles = set()
-    for trig_title in trig_news:
-        trig_news_titles.add(trig_title)
-# *****************************************************************************
-    if not articles:
-        # This is when an empty list of news is returned after API request
-        result = 'No news found.'
-    else:
-        result = "Today's news"
+def filtering_news(articles):
 
     # Filtering news by selecting articles that do not have the triggering title.
+    if BannedNews:
         filtered_articles = []
         for article in articles:
-            if article.title not in trig_news_titles
+            app.logger.info(article)
+            if article['title'] not in BannedNews.query.filter(BannedNews.trig_article == article['title']).all():
                 filtered_articles.append(article)
-# *****************************************************************************
-    return render_template('filtered_news.html',
-                           user=user,
-                           result=result,
-                           articles=filtered_articles,
-                           news=news_type,
-                           user_id=user_id)
+    else:
+        filtered_articles = articles
+
+    return filtered_articles
 
 
 @app.route('/trig-tagged-news/<user_id>', methods=['POST'])
@@ -184,27 +184,34 @@ def trig_tagging_news(user_id):
     triggering words that the user can choose from. """
 
     trig_article = request.form.get("trig_article")
-    return render_template('triggered.html', trig_article=trig_article)
+    return render_template('triggered.html', trig_article=trig_article, user_id=user_id)
 
 
-@app.route('/trig-submitted/<trig_article>', methods=['POST'])
-def trig_tagging(trig_article):
+@app.route('/trig-submitted/<trig_article>/<user_id>', methods=['POST'])
+def trig_tagging(trig_article, user_id):
     """Adds the triggering article and trigger word associated with it to the db"""
 
     # Getting a list of news objects:
-    trig_news = News.query.all()
+    trig_news = BannedNews.query.all()
 
     # Checking if triggering article is already in the database. If it isn't,
     # adding the article to the news table.
     if trig_article not in trig_news:
         trig_words = request.form.get("trig_words")
-        new_trig_article = News(trig_article=trig_article,
-                                trig_words=trig_words,
-                                date_added=date.today())
+        new_trig_article = BannedNews(trig_article=trig_article,
+                                      trig_words=trig_words,
+                                      date_added=date.today())
         db.session.add(new_trig_article)
-        db.session.commit()
 
-    return render_template('trigger_submitted.html')
+    # if trig_news:
+    #     today = date.today()
+    #     # Below, I am deleting rows that contain news articles from yesterday and before.
+    #     old_news = BannedNews.query.filter(BannedNews.date_added.isnot(today))
+    #     db.session.delete(old_news)
+
+    db.session.commit()
+
+    return render_template('trigger_submitted.html', user_id=user_id)
 
 
 if __name__ == "__main__":

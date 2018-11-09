@@ -22,10 +22,10 @@ class User(db.Model):
         return "<User {} user_id={} triggers={}>".format(username=self.email, user_id=self.user_id, trigger=self.trig)
 
 
-class News(db.Model):
+class BannedNews(db.Model):
     """ News with news id. """
 
-    __tablename__ = 'news'
+    __tablename__ = 'bannednews'
 
     news_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     trig_article = db.Column(db.String(200), nullable=False)
@@ -35,7 +35,7 @@ class News(db.Model):
     def __repr__(self):
         """Provide useful output when printing."""
 
-        return f"<News_id={self.news_id} triggers={self.trig_words}>"
+        return f"<News_id={self.news_id} triggers={self.trig_words} date_added={self.trig_words}>"
 
 
 # -------------------------------------------------------------------
