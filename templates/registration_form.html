@@ -5,21 +5,37 @@
 
   <form action = '/register' method='POST' >
     Email address:<br>
-    <input type="email" name="email">
+    <input type="email" name="email" required>
     <br>
     Password:<br>
-    <input type="password" name="password">
+    <input type="password" name="password" required>
     <br><br>
-    Trigger words:
-     <select name="trig_word">
-      <option value="rape">Ra**</option>
-      <option value="war">War</option>
-      <option value="crash">Cr**h</option>
-      <option value="assault">Ass**lt</option>
-      <option value="trump">Tr**p</option>
+    Trigger words:<br>
+      <input type = "checkbox" value="rape" >Ra** <br>
+      <input type = "checkbox" value="war">War <br>
+      <input type = "checkbox" value="crash">Cr**h <br>
+      <input type = "checkbox" value="assault">Ass**lt <br>
+      <input type = "checkbox" value="trump">Tr**p <br>
+      Other:<br>
+        <input type = 'text'><br>
     </select>
     <br><br>
     <input type="submit" value="Submit">
   </form>
 
 {% endblock %}
+
+
+
+Article Tite: {{trig_article}}
+        <form action = '/trig-submitted/{{trig_article}}/{{user_id}}' method='POST' >
+        Please select associated triggering tag:<br>
+        <input type = 'checkbox' name="trig_words" value="rape">R**e<br>
+        <input type = 'checkbox' name="trig_words" value="war">War<br>
+        <input type = 'checkbox' name="trig_words" value="crash">Cr**h<br>
+        <input type = 'checkbox' name="trig_words" value="assault">As***lt<br>
+        <input type = 'checkbox' name="trig_words" value="trump">Tr**p<br><br>
+
+      <input type="submit" value="Submit">
+    </form>
+

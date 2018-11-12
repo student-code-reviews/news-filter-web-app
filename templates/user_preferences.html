@@ -5,18 +5,25 @@
 
   <form action = '/register' method='POST' >
     Email address:<br>
-    <input type="text" name="email">
+    <input type="email" name="email">
     <br>
     Password:<br>
-    <input type="text" name="password">
+    <input type="password" name="password">
     <br><br>
     Trigger words:
      <select name="trigger_words">
-      <option value="rape">Rape</option>
+      <option type = 'checkbox' value="rape">R**e<br>
+      <option type = 'checkbox' value="war">War<br>
+      <option type = 'checkbox' value="crash">Crash<br>
+      <option type = 'checkbox' value="assault">Assault<br>
+      <option type = 'checkbox' value="trump">Trump<br>
+      Other:<br>
+        <input type = 'text'><br>
+      <!-- <option value="rape">Rape</option>
       <option value="war">War</option>
       <option value="crash">Crash</option>
       <option value="assault">Assault</option>
-      <option value="trump">Trump</option>
+      <option value="trump">Trump</option> -->
     </select>
     <br><br>
     <input type="submit" value="Submit">
