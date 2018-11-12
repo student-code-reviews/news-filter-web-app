@@ -13,7 +13,7 @@ class User(db.Model):
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(50), nullable=True)
-    password = db.Column(db.String, nullable=True)
+    password = db.Column(db.Binary, nullable=True)
     trig = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):

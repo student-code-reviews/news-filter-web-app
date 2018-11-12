@@ -13,7 +13,7 @@ from newsapi import NewsApiClient
 import requests
 # For password hashing
 import bcrypt
-
+from six import u
 from datetime import date
 
 newsapi = NewsApiClient(api_key=os.environ.get('MY_KEY_NAME'))
@@ -51,8 +51,10 @@ def register_form():
 
     else:
         user_email = request.form.get("email")
-        user_password = u(request.form.get("password"))
-        hashed_password = bcrypt.hashpw(user_password.encode('utf8')), bcrypt.gensalt()
+        u_password = u(request.form.get("password"))
+        user_password = u_password.encode('utf8')
+        hashed_password = bcrypt.hashpw(user_password, bcrypt.gensalt())
+
         # tr_words is a string. For now, it is only one word.
         trig_word = request.form.get("trig_word")
 
@@ -77,7 +79,7 @@ def login():
 def logged_in():
     """Logged in or not"""
 
-    email = request.form.get("email")
+    email = str(request.form.get("email"))
     password = u(request.form.get("password"))
 
     # Checking to see if this email exists in the database. Making a user object.
@@ -94,7 +96,7 @@ def logged_in():
             flash("You have successfully logged in!")
             return redirect(f"news-options/{user_id}")
         else:
-            return redirect("/login")
+            raise InvalidCredentials("403 Forbidden")
     else:
         return redirect("/login")
 
