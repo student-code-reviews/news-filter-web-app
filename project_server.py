@@ -11,6 +11,8 @@ from project_model import User, BannedNews, connect_to_db, db
 from newsapi import NewsApiClient
 
 import requests
+# For password hashing
+import bcrypt
 
 from datetime import date
 
@@ -21,9 +23,7 @@ app = Flask(__name__)
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = "ABC"
 
-# Normally, if you use an undefined variable in Jinja2, it fails
-# silently. This is horrible. Fix this so that, instead, it raises an
-# error.
+# An undefined variable in Jinja2 will not fail silently:
 app.jinja_env.undefined = StrictUndefined
 
 
@@ -51,14 +51,15 @@ def register_form():
 
     else:
         user_email = request.form.get("email")
-        user_password = request.form.get("password")
+        user_password = u(request.form.get("password"))
+        hashed_password = bcrypt.hashpw(user_password.encode('utf8')), bcrypt.gensalt()
         # tr_words is a string. For now, it is only one word.
         trig_word = request.form.get("trig_word")
 
         user_list = db.session.query(User.email).all()
 
         if user_email not in user_list:
-            new_user = User(email=user_email, password=user_password, trig=trig_word)
+            new_user = User(email=user_email, password=hashed_password, trig=trig_word)
             db.session.add(new_user)
             db.session.commit()
 
@@ -77,22 +78,23 @@ def logged_in():
     """Logged in or not"""
 
     email = request.form.get("email")
-    password = request.form.get("password")
+    password = u(request.form.get("password"))
 
     # Checking to see if this email exists in the database. Making a user object.
     user = User.query.filter(User.email == email).one()
 
     # Checking to see if the password matches for the email provided by the user.
-    user_check = User.query.filter(User.email == email, User.password == password).all()
-
-    # If the check works for the email and matching password, news options page is rendered.
-    # Otherwise, the login page is rendered again.
-    if user_check:
-        session['user'] = email
-        # User id is saved in this variable.
-        user_id = int(user.user_id)
-        flash("You have successfully logged in!")
-        return redirect(f"news-options/{user_id}")
+    if user:
+        if bcrypt.checkpw(password.encode('utf8'), user.password):
+            # If the check works for the email and matching password, news options page is rendered.
+            # Otherwise, the login page is rendered again.
+            session['user'] = email
+            # User id is saved in this variable.
+            user_id = int(user.user_id)
+            flash("You have successfully logged in!")
+            return redirect(f"news-options/{user_id}")
+        else:
+            return redirect("/login")
     else:
         return redirect("/login")
 
