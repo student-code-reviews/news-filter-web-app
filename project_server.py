@@ -96,7 +96,7 @@ def logged_in():
             flash("You have successfully logged in!")
             return redirect(f"news-options/{user_id}")
         else:
-            raise InvalidCredentials("403 Forbidden")
+            return redirec("/login")
     else:
         return redirect("/login")
 
@@ -213,11 +213,13 @@ def trig_tagging(trig_article, user_id):
                                       date_added=date.today())
         db.session.add(new_trig_article)
 
-    # if trig_news:
-    #     today = date.today()
-    #     # Below, I am deleting rows that contain news articles from yesterday and before.
-    #     old_news = BannedNews.query.filter(BannedNews.date_added.isnot(today))
-    #     db.session.delete(old_news)
+    if trig_news:
+        today = str(date.today())
+        # Below, I am deleting rows that contain news articles from yesterday and before.
+        old_news = BannedNews.query.filter(BannedNews.date_added != today).all()
+        print(old_news)
+        for item in old_news:
+            db.session.delete(item)
 
     db.session.commit()
 
