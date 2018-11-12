@@ -213,11 +213,11 @@ def trig_tagging(trig_article, user_id):
                                       date_added=date.today())
         db.session.add(new_trig_article)
 
+    # Checking for items in trig_news, and deleting old banned news items.
     if trig_news:
         today = str(date.today())
         # Below, I am deleting rows that contain news articles from yesterday and before.
         old_news = BannedNews.query.filter(BannedNews.date_added != today).all()
-        print(old_news)
         for item in old_news:
             db.session.delete(item)
 
