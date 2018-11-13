@@ -7,7 +7,11 @@
       Password:<br>
       <input type="password" name="password">
       <br><br>
-      Your current trigger words are: {{trig_words}} <br><br>
+      Your current trigger words are: <br>
+      {% for trig_word in trig_words%}
+      {{trig_word}}<br>
+      {% endfor %}
+      <br>
       Trigger words:<br>
         <input type = 'checkbox' name = "trig_word" value="rape">R**e<br>
         <input type = 'checkbox' name = "trig_word" value="war">War<br>

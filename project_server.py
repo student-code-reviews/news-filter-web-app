@@ -55,12 +55,15 @@ def register_form():
         user_password = u_password.encode('utf8')
         hashed_password = bcrypt.hashpw(user_password, bcrypt.gensalt())
 
-        # tr_words is a string. For now, it is only one word.
-        trig_word = request.form.getlist("trig_word")
+        # trig_words is a list with one or multiple words.
+        trig_words = request.form.getlist("trig_word")
+        print(trig_words)
+
+        # Getting all
         user_list = db.session.query(User.email).all()
 
         if user_email not in user_list:
-            new_user = User(email=user_email, password=hashed_password, trig=trig_word)
+            new_user = User(email=user_email, password=hashed_password, trig=trig_words)
             db.session.add(new_user)
             db.session.commit()
 
@@ -128,12 +131,12 @@ def update_preferences(user_id):
         # For updating a row entry in the table, I used the update method.
         user.query.update({"password": hashed_password})
 
-    # # tr_words is a string. For now, it is only one word.
-    trig_word = request.form.getlist("trig_word")
+    # # tr_words is a string.
+    trig_words = request.form.getlist("trig_word")
+    print(type(trig_word))
 
-    if trig_word:
-        user.query.update({"trig": trig_word})
-        user.trig = trig_word
+    if trig_words:
+        user.query.update({"trig": trig_words})
 
     db.session.commit()
 

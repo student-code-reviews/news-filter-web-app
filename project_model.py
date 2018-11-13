@@ -2,6 +2,7 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects.postgresql import ARRAY
 
 db = SQLAlchemy()
 
@@ -14,7 +15,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(50), nullable=True)
     password = db.Column(db.Binary, nullable=True)
-    trig = db.Column(db.String(100), nullable=False)
+    trig = db.Column(ARRAY(db.String(100)), nullable=False)
 
     def __repr__(self):
         """Provide useful output when printing."""
