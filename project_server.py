@@ -44,8 +44,9 @@ def index():
 def register_form():
     """Registration form that takes email address, password and trigger words."""
 
-    # Reg form is rendered when you go to page. When it is submitted, a post request is made and if user's email is not in database then it gets added and redirected to the
-    # homepage.
+    # Reg form is rendered when you go to page. When it is submitted, a
+    # post request is made and if user's email is not in database then
+    # it gets added and redirected to the homepage.
     if request.method == 'GET':
         return render_template("registration_form.html")
 
@@ -62,7 +63,9 @@ def register_form():
         user_list = db.session.query(User.email).all()
 
         if user_email not in user_list:
-            new_user = User(email=user_email, password=hashed_password, trig=trig_words)
+            new_user = User(email=user_email,
+                            password=hashed_password,
+                            trig=trig_words)
             db.session.add(new_user)
             db.session.commit()
 
