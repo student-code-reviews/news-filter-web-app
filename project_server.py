@@ -51,8 +51,7 @@ def register_form():
 
     else:
         user_email = request.form.get("email")
-        u_password = u(request.form.get("password"))
-        user_password = u_password.encode('utf8')
+        user_password = (u(request.form.get("password"))).encode('utf8')
         hashed_password = bcrypt.hashpw(user_password, bcrypt.gensalt())
 
         # trig_words is a list with one or multiple words.
@@ -133,7 +132,6 @@ def update_preferences(user_id):
 
     # # tr_words is a string.
     trig_words = request.form.getlist("trig_word")
-    print(type(trig_word))
 
     if trig_words:
         user.query.update({"trig": trig_words})
@@ -158,10 +156,10 @@ def userpreferences(user_id):
 
     # Making a user object to access trigger word for that user.
     user = User.query.get('{}'.format(user_id))
-    trig_word = user.trig
+    trig_words = user.trig
 
     # Calling get_articles function that sends an API request.
-    filtered_articles = get_articles(news_type, trig_word)
+    filtered_articles = get_articles(news_type, trig_words)
 
     if not filtered_articles:
         # This is when an empty list of news is returned after API request
@@ -177,7 +175,7 @@ def userpreferences(user_id):
                            user_id=user_id)
 
 
-def get_articles(news_type, trig_word):
+def get_articles(news_type, trig_words):
     """ Sends a request to NewsAPI with user's trigger words and preference for type of news."""
     # Based on user's preference of news section, providing section news.
     news_options = {'world': 'bbc.co.uk',
@@ -187,9 +185,12 @@ def get_articles(news_type, trig_word):
                     'sports': 'espn.com'}
 
     domains = news_options[news_type]
+    trig_words_str = ''
+    for trig_word in trig_words:
+        trig_words_str += trig_word + ', '
 
     # Sending request to News API below:
-    all_articles = newsapi.get_everything(q=f'-{trig_word}',
+    all_articles = newsapi.get_everything(q=f'-{trig_words_str}',
                                           domains=domains,
                                           from_param=f'{date.today()}',
                                           to=f'{date.today()}',
