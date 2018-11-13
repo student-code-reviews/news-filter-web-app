@@ -129,10 +129,11 @@ def update_preferences(user_id):
         user.query.update({"password": hashed_password})
 
     # # tr_words is a string. For now, it is only one word.
-    # trig_word = request.form.get("trig_word")
+    trig_word = request.form.getlist("trig_word")
 
-    # if trig_word:
-    #     user.trig = trig_word
+    if trig_word:
+        user.query.update({"trig": trig_word})
+        user.trig = trig_word
 
     db.session.commit()
 
