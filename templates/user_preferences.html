@@ -1,32 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
 
-  <h2>Your preferences: </h2>
-
-  <form action = '/register' method='POST' >
-    Email address:<br>
-    <input type="email" name="email">
-    <br>
-    Password:<br>
-    <input type="password" name="password">
-    <br><br>
-    Trigger words:
-     <select name="trigger_words">
-      <option type = 'checkbox' value="rape">R**e<br>
-      <option type = 'checkbox' value="war">War<br>
-      <option type = 'checkbox' value="crash">Crash<br>
-      <option type = 'checkbox' value="assault">Assault<br>
-      <option type = 'checkbox' value="trump">Trump<br>
-      Other:<br>
-        <input type = 'text'><br>
-      <!-- <option value="rape">Rape</option>
-      <option value="war">War</option>
-      <option value="crash">Crash</option>
-      <option value="assault">Assault</option>
-      <option value="trump">Trump</option> -->
-    </select>
-    <br><br>
-    <input type="submit" value="Submit">
-  </form>
-
+  <h2>You can update your preferences here: </h2>
+  <p>
+    <form action = "/preferences-updated/{{user_id}}" method='POST'>
+      Password:<br>
+      <input type="password" name="password">
+      <br><br>
+      Your current trigger words are: {{trig_words}} <br><br>
+      Trigger words:<br>
+        <input type = 'checkbox' name = "trig_word" value="rape">R**e<br>
+        <input type = 'checkbox' name = "trig_word" value="war">War<br>
+        <input type = 'checkbox' name = "trig_word" value="crash">Crash<br>
+        <input type = 'checkbox' name = "trig_word" value="assault">Assault<br>
+        <input type = 'checkbox' name = "trig_word" value="trump">Trump<br>
+        Other:<br>
+          <input type = 'text' name = "trig_word"><br>
+        <br><br>
+      <input type="submit" value="Submit">
+    </form>
+  </p>
 {% endblock %}

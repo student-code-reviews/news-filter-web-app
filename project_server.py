@@ -30,7 +30,7 @@ app.jinja_env.undefined = StrictUndefined
 @app.route('/')
 def index():
     """Homepage."""
-
+    session.clear()
 # Here, we are checking if the user is logged in (session has 'user' key)
     if 'user' in session:
         user = User.query.filter(User.email == session['user']).one()
@@ -56,8 +56,7 @@ def register_form():
         hashed_password = bcrypt.hashpw(user_password, bcrypt.gensalt())
 
         # tr_words is a string. For now, it is only one word.
-        trig_word = request.form.get("trig_word")
-
+        trig_word = request.form.getlist("trig_word")
         user_list = db.session.query(User.email).all()
 
         if user_email not in user_list:
@@ -71,7 +70,6 @@ def register_form():
 @app.route('/login')
 def login():
     """Login Page."""
-
     return render_template("login.html")
 
 
@@ -96,7 +94,7 @@ def logged_in():
             flash("You have successfully logged in!")
             return redirect(f"news-options/{user_id}")
         else:
-            return redirec("/login")
+            return redirect("/login")
     else:
         return redirect("/login")
 
@@ -108,6 +106,37 @@ def logout():
     session.clear()
     flash("Logged out!")
     return redirect("/")
+
+
+@app.route('/user-preferences/<user_id>')
+def change_preferences(user_id):
+    """ User can change preference og trigger words or password"""
+    user = User.query.get(user_id)
+    trig_words = user.trig
+    return render_template('user_preferences.html', user_id=user_id, trig_words=trig_words)
+
+
+@app.route('/preferences-updated/<user_id>', methods=['POST'])
+def update_preferences(user_id):
+    """ Preferences for the user are updated in the database"""
+    input_password = request.form.get("password")
+    user = db.session.query(User).filter(User.user_id == user_id).one()
+    if input_password:
+        u_password = u(input_password)
+        user_password = u_password.encode('utf8')
+        hashed_password = bcrypt.hashpw(user_password, bcrypt.gensalt())
+        # For updating a row entry in the table, I used the update method.
+        user.query.update({"password": hashed_password})
+
+    # # tr_words is a string. For now, it is only one word.
+    # trig_word = request.form.get("trig_word")
+
+    # if trig_word:
+    #     user.trig = trig_word
+
+    db.session.commit()
+
+    return render_template('preferences_updated.html', user_id=user_id)
 
 
 @app.route('/news-options/<user_id>')
@@ -213,13 +242,13 @@ def trig_tagging(trig_article, user_id):
                                       date_added=date.today())
         db.session.add(new_trig_article)
 
-    # Checking for items in trig_news, and deleting old banned news items.
-    if trig_news:
-        today = str(date.today())
-        # Below, I am deleting rows that contain news articles from yesterday and before.
-        old_news = BannedNews.query.filter(BannedNews.date_added != today).all()
-        for item in old_news:
-            db.session.delete(item)
+    # Checking for items in trig_news, and deleting old banned news items. Not needed right now.
+    # if trig_news:
+    #     today = str(date.today())
+    #     # Below, I am deleting rows that contain news articles from yesterday and before.
+    #     old_news = BannedNews.query.filter(BannedNews.date_added != today).all()
+    #     for item in old_news:
+    #         db.session.delete(item)
 
     db.session.commit()
 
