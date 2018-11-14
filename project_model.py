@@ -3,6 +3,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import ARRAY
+from datetime import date
 
 db = SQLAlchemy()
 
@@ -67,6 +68,35 @@ def connect_to_db(app):
     # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # db.app = app
     # db.init_app(app)
+
+
+def example_data():
+    """Create some sample data."""
+
+    # In case this is run more than once, empty out existing data
+    User.query.delete()
+    BannedNews.query.delete()
+
+    # Add sample employees and departments
+    news1 = BannedNews(news_id=1,
+                       trig_article='This is an examle',
+                       trig_words='rape, war',
+                       date_added=date.today())
+    news2 = BannedNews(news_id=1,
+                       trig_article='This is an examle',
+                       trig_words='assault',
+                       date_added=date.today())
+    news3 = BannedNews(news_id=1,
+                       trig_article='This is an examle',
+                       trig_words='rape, trump',
+                       date_added=date.today())
+
+    user1 = User(name='Leonard', dept=dl)
+    user2 = User(name='Liz', dept=dl)
+    user3 = User(name='Maggie', dept=dm)
+
+    db.session.add_all([df, dl, dm, leonard, liz, maggie, nadine])
+    db.session.commit()
 
 
 if __name__ == "__main__":

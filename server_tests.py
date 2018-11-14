@@ -1,6 +1,7 @@
 import project_server
 from unittest import TestCase
 from project_server import app
+from six import b
 
 
 # class MyAppUnitTestCase(TestCase):
@@ -16,6 +17,7 @@ class FlaskTests(TestCase):
     def setUp(self):
         """ Stuff to do before every test. """
 
+        # Get the Flask test client
         self.client = app.test_client()
         app.config['TESTING'] = True
 
@@ -41,7 +43,8 @@ class FlaskTests(TestCase):
         result = self.client.post("/login",
                                   data={"email": "k@gmail.com", "password": "123"},
                                   follow_redirects=True)
-        self.assertIn(b"Login here: ", result.data)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('<h2>Login here: </h2>', result.data)
 
     def test_register_page(self):
         result = self.client.get("/register")
@@ -62,21 +65,22 @@ class FlaskTestsLoggedIn(TestCase):
         creates client, connects to test database, creates
         the tables, and seeds the test database."""
 
+        # Get the Flask test client
         app.config['TESTING'] = True
         app.config['SECRET_KEY'] = 'ABC'
         self.client = app.test_client()
 
+        # Connect to test database
         connect_to_db(app, "postgresql:///testdb")
+
+        # Create tables and add sample data
+        db.create_all()
+        example_data()
 
         with self.client as c:
             with c.session_transaction() as sess:
                 sess['user'] = 'k@gmail.com'
 
-    def test_important_page(self):
-        """Test important page."""
-
-        result = self.client.get("/important")
-        self.assertIn(b"You are a valued user", result.data)
 
 ######################################################################
 # Tests that require an active session, but no database access
