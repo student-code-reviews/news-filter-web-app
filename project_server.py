@@ -11,12 +11,11 @@ from project_model import User, BannedNews, connect_to_db, db
 from newsapi import NewsApiClient
 
 import requests
-# For password hashing
-import bcrypt
-from six import u
+
 # For date_added column in the bannednews table.
 from datetime import date
-
+import bcrypt
+from six import u
 newsapi = NewsApiClient(api_key=os.environ.get('MY_KEY_NAME'))
 
 app = Flask(__name__)
@@ -53,8 +52,8 @@ def register_form():
 
     else:
         user_email = request.form.get("email")
-        user_password = (u(request.form.get("password"))).encode('utf8')
-        hashed_password = bcrypt.hashpw(user_password, bcrypt.gensalt())
+        user_password = request.form.get("password")
+        hashed_password = hash_password(user_password)
 
         # trig_words is a list with one or multiple words.
         trig_words = request.form.getlist("trig_word")
@@ -262,6 +261,18 @@ def trig_tagging(trig_article, user_id):
     db.session.commit()
 
     return render_template('trigger_submitted.html', user_id=user_id)
+# ------------------------------------------------------------------------------------------
+# HELPER FUNCTIONS:
+# ------------------------------------------------------------------------------------------
+
+
+def hash_password(password):
+    """ Given a string, hashes it using bcrypt"""
+    # For password hashing
+    u_password = u(password)
+    encoded_password = u_password.encode('utf8')
+    hashed_password = bcrypt.hashpw(encoded_password, bcrypt.gensalt())
+    return hashed_password
 
 
 if __name__ == "__main__":
@@ -272,7 +283,7 @@ if __name__ == "__main__":
     # make sure templates, etc. are not cached in debug mode
     app.jinja_env.auto_reload = app.debug
 
-    connect_to_db(app)
+    connect_to_db(app, uri='postgres:///filterednews')
 
     # Use the DebugToolbar
     DebugToolbarExtension(app)

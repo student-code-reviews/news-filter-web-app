@@ -1,12 +1,11 @@
-import project_server
-from unittest import TestCase
+from project_server import app, hash_password
+import unittest
 from project_server import app
-from six import b
-
-
-# class MyAppUnitTestCase(TestCase):
-
-#     def test_
+from six import b, u
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from project_model import User, BannedNews, db, connect_to_db
+from datetime import date
 
 ######################################################################
 # Tests that don't require the database nor an active session.
@@ -14,7 +13,8 @@ from six import b
 # register page.
 ######################################################################
 
-class FlaskTests(TestCase):
+
+class FlaskTests(unittest.TestCase):
 
     def setUp(self):
         """ Stuff to do before every test. """
@@ -23,42 +23,29 @@ class FlaskTests(TestCase):
         self.client = app.test_client()
         app.config['TESTING'] = True
 
-    def tearDown(self):
-        """ Stuff to do after each test."""
-        pass
-
     def test_homepage(self):
         """ Test homepage when user is not logged in."""
-        result = self.clent.get("/")
+        result = self.client.get("/")
         self.assertEqual(result.status_code, 200)
-        self.assertIn('<h1>Filtered News</h1>', result.data)
+        self.assertIn(b'Filtered News', result.data)
 
     def test_login_page(self):
         """ Test whether login page is displayed. """
         result = self.client.get("/login")
         self.assertEqual(result.status_code, 200)
-        self.assertIn('<h2>Login here: </h2>', result.data)
-
-    def test_login(self):
-        """Test whether user can login."""
-
-        result = self.client.post("/login",
-                                  data={"email": "k@gmail.com", "password": "123"},
-                                  follow_redirects=True)
-        self.assertEqual(result.status_code, 200)
-        self.assertIn('<h2>Login here: </h2>', result.data)
+        self.assertIn(b'Login here:', result.data)
 
     def test_register_page(self):
         result = self.client.get("/register")
         self.assertEqual(result.status_code, 200)
-        self.assertIn("<h2>Email address:</h2>", result.data)
+        self.assertIn(b"<h2>To register, please provide your email address, password and news filtering preferences</h2>", result.data)
 
 
 ######################################################################
 # Tests that require an active session, but no database access
 ######################################################################
 
-class FlaskTestsSessionOn(TestCase):
+class FlaskTestsSessionOn(unittest.TestCase):
     """ Flasks tests when session is on without
     database connection"""
 
@@ -76,7 +63,7 @@ class FlaskTestsSessionOn(TestCase):
     def test_logout(self):
         """ Test logout when user in session."""
         result = self.client.get("/logout", follow_redirects=True)
-        self.assertIn("Logged out!", result.data)
+        self.assertIn(b"Logged out!", result.data)
 
 
 ######################################################################
@@ -84,7 +71,7 @@ class FlaskTestsSessionOn(TestCase):
 # alter the state of the database.
 ######################################################################
 
-class FlaskTestsLoggedIn(TestCase):
+class FlaskTestsLoggedIn(unittest.TestCase):
     """Flask tests with user logged in to session."""
 
     def setUp(self):
@@ -98,10 +85,9 @@ class FlaskTestsLoggedIn(TestCase):
         self.client = app.test_client()
 
         # Connect to test database
-        connect_to_db(app, "postgresql:///testdb")
+        connect_to_db(app, uri='postgres:///testdb')
 
         # Create tables and add sample data
-        db.create_all()
         example_data()
 
         with self.client as c:
@@ -120,10 +106,10 @@ class FlaskTestsLoggedIn(TestCase):
 
         result = self.client.post("/logged-in",
                                   data={"email": 'hello@gmail.com',
-                                        "password": '010101'},
+                                        "password": "hello"},
                                   follow_redirects=True)
 
-        self.assertIn("You have successfully logged in!", result.data)
+        self.assertIn(b"You have successfully logged in!", result.data)
 
 ######################################################################
 # Tests that require database access, need an active session, and
@@ -131,7 +117,7 @@ class FlaskTestsLoggedIn(TestCase):
 ######################################################################
 
 
-class FlaskTestsChangeDB(TestCase):
+class FlaskTestsChangeDB(unittest.TestCase):
     """Flask tests for changing database."""
 
     def setUp(self):
@@ -145,37 +131,32 @@ class FlaskTestsChangeDB(TestCase):
         self.client = app.test_client()
 
         # Connect to test database
-        connect_to_db(app, "postgresql:///testdb")
+        connect_to_db(app, uri='postgres:///testdb')
 
         # Create tables and add sample data
-        db.create_all()
         example_data()
-
-        with self.client as c:
-            with c.session_transaction() as sess:
-                sess['user'] = 'k@gmail.com'
 
     def tearDown(self):
         """Do at the end of every test"""
 
         db.session.close()
-        db.drop_all()
+        # db.drop_all()
 
     def test_registration_form(self):
         """ Tests if user can register and save data
         into database."""
 
         result = self.client.post("/register",
-                                  data={"email"="test@email.com",
-                                        "password"="0000",
-                                        "trig_word"='rape'},
+                                  data={"email": "test@email.com",
+                                        "password": "0000",
+                                        "trig_word": 'rape'},
                                   follow_redirects=True)
-        self.assertIn("Login", result.data)
+        self.assertIn(b"login", result.data)
 
     def test_tagging_news(self):
         """Test tagging news article and
         adding it to the database"""
-
+        pass
 
 ######################################################################
 # Helper functions to run the tests
@@ -191,29 +172,26 @@ def example_data():
 
     # Add sample employees and departments
     news1 = BannedNews(news_id=1,
-                       trig_article='This is an examle',
+                       trig_article='This is an example',
                        trig_words='rape, war',
                        date_added=date.today())
     news2 = BannedNews(news_id=2,
-                       trig_article='This is an examle',
+                       trig_article='This is an example',
                        trig_words='assault',
                        date_added=date.today())
     news3 = BannedNews(news_id=3,
-                       trig_article='This is an examle',
+                       trig_article='This is an example',
                        trig_words='rape, trump',
                        date_added=date.today())
-
-    user1 = User(user_id=1,
-                 email='hello@gmail.com',
-                 password='010101',
+    password = hash_password("hello")
+    user1 = User(email='hello@gmail.com',
+                 password=password,
                  trig='rape')
-    user2 = User(user_id=2,
-                 email='test@gmail.com',
-                 password='010101',
+    user2 = User(email='test@gmail.com',
+                 password=password,
                  trig='war')
-    user3 = User(user_id=3,
-                 email='hi@gmail.com',
-                 password='010101',
+    user3 = User(email='hi@gmail.com',
+                 password=password,
                  trig='rape')
 
     db.session.add_all([news1, news2, news3, user1, user2, user3])

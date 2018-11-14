@@ -46,66 +46,24 @@ class BannedNews(db.Model):
 
 def init_app():
     # So that we can use Flask-SQLAlchemy, we'll make a Flask app.
-    from flask import Flask
     app = Flask(__name__)
 
-    connect_to_db(app)
-    db.create_all()
+    connect_to_db(app, uri='postgres:///filterednews')
+
     print("Connected to DB.")
 
 
-def connect_to_db(app):
+def connect_to_db(app, uri='postgres:///filterednews'):
     """Connect the database to our Flask app."""
 
     # Configure to use our database.
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///filterednews'
+    app.config['SQLALCHEMY_DATABASE_URI'] = uri
     app.config['SQLALCHEMY_ECHO'] = False
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
+
     db.init_app(app)
-
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///ratings'
-    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    # db.app = app
-    # db.init_app(app)
-
-
-def example_data():
-    """Create some sample data."""
-
-    # In case this is run more than once, empty out existing data
-    User.query.delete()
-    BannedNews.query.delete()
-
-    # Add sample employees and departments
-    news1 = BannedNews(news_id=1,
-                       trig_article='This is an examle',
-                       trig_words='rape, war',
-                       date_added=date.today())
-    news2 = BannedNews(news_id=2,
-                       trig_article='This is an examle',
-                       trig_words='assault',
-                       date_added=date.today())
-    news3 = BannedNews(news_id=3,
-                       trig_article='This is an examle',
-                       trig_words='rape, trump',
-                       date_added=date.today())
-
-    user1 = User(user_id=1,
-                 email='hello@gmail.com',
-                 password='hello',
-                 trig='rape')
-    user2 = User(user_id=2,
-                 email='test@gmail.com',
-                 password='test',
-                 trig='war')
-    user3 = User(user_id=3,
-                 email='hi@gmail.com',
-                 password='hi',
-                 trig='rape')
-
-    db.session.add_all([news1, news2, news3, user1, user2, user3])
-    db.session.commit()
+    db.create_all()
 
 
 if __name__ == "__main__":
