@@ -114,7 +114,7 @@ class FlaskTestsLoggedIn(TestCase):
         db.session.close()
         db.drop_all()
 
-    def test_login(self):
+    def test_logging_in(self):
         """ Tests if login function works and
         is able to access database."""
 
@@ -125,24 +125,57 @@ class FlaskTestsLoggedIn(TestCase):
 
         self.assertIn("You have successfully logged in!", result.data)
 
-# class FlaskTestsLoggedIn(TestCase):
-#     """Flask tests with user logged in to session."""
-
-#     def setUp(self):
-#         """Stuff to do before every test."""
-
-#         app.config['TESTING'] = True
-#         app.config['SECRET_KEY'] = 'ABC'
-#         self.client = app.test_client()
-
-#         with self.client as c:
-#             with c.session_transaction() as sess:
-#                 sess['user'] = 'k@gmail.com'
-
 ######################################################################
 # Tests that require database access, need an active session, and
 # can actually change the database.
 ######################################################################
+
+
+class FlaskTestsChangeDB(TestCase):
+    """Flask tests for changing database."""
+
+    def setUp(self):
+        """Necessary before every test. Configures the app,
+        creates client, connects to test database, creates
+        the tables, and seeds the test database."""
+
+        # Get the Flask test client
+        app.config['TESTING'] = True
+        app.config['SECRET_KEY'] = 'ABC'
+        self.client = app.test_client()
+
+        # Connect to test database
+        connect_to_db(app, "postgresql:///testdb")
+
+        # Create tables and add sample data
+        db.create_all()
+        example_data()
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user'] = 'k@gmail.com'
+
+    def tearDown(self):
+        """Do at the end of every test"""
+
+        db.session.close()
+        db.drop_all()
+
+    def test_registration_form(self):
+        """ Tests if user can register and save data
+        into database."""
+
+        result = self.client.post("/register",
+                                  data={"email"="test@email.com",
+                                        "password"="0000",
+                                        "trig_word"='rape'},
+                                  follow_redirects=True)
+        self.assertIn("Login", result.data)
+
+    def test_tagging_news(self):
+        """Test tagging news article and
+        adding it to the database"""
+
 
 ######################################################################
 # Helper functions to run the tests
