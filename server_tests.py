@@ -9,7 +9,9 @@ from six import b
 #     def test_
 
 ######################################################################
-# Tests that don't require the database nor an active session
+# Tests that don't require the database nor an active session.
+# Summary of tests in this section: homepage, log in page,
+# register page.
 ######################################################################
 
 class FlaskTests(TestCase):
@@ -53,6 +55,31 @@ class FlaskTests(TestCase):
 
 
 ######################################################################
+# Tests that require an active session, but no database access
+######################################################################
+
+class FlaskTestsSessionOn(TestCase):
+    """ Flasks tests when session is on without
+    database connection"""
+
+    def setUp(self):
+        """Stuff to do before every test."""
+
+        app.config['TESTING'] = True
+        app.config['SECRET_KEY'] = 'ABC'
+        self.client = app.test_client()
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user'] = 'k@gmail.com'
+
+    def test_logout(self):
+        """ Test logout when user in session."""
+        result = self.client.get("/logout", follow_redirects=True)
+        self.assertIn("Logged out!", result.data)
+
+
+######################################################################
 # Tests that require database access and an active session, but don't
 # alter the state of the database.
 ######################################################################
@@ -81,35 +108,83 @@ class FlaskTestsLoggedIn(TestCase):
             with c.session_transaction() as sess:
                 sess['user'] = 'k@gmail.com'
 
+    def tearDown(self):
+        """Do at the end of every test"""
+
+        db.session.close()
+        db.drop_all()
+
+    def test_login(self):
+        """ Tests if login function works and
+        is able to access database."""
+
+        result = self.client.post("/logged-in",
+                                  data={"email": 'hello@gmail.com',
+                                        "password": '010101'},
+                                  follow_redirects=True)
+
+        self.assertIn("You have successfully logged in!", result.data)
+
+# class FlaskTestsLoggedIn(TestCase):
+#     """Flask tests with user logged in to session."""
+
+#     def setUp(self):
+#         """Stuff to do before every test."""
+
+#         app.config['TESTING'] = True
+#         app.config['SECRET_KEY'] = 'ABC'
+#         self.client = app.test_client()
+
+#         with self.client as c:
+#             with c.session_transaction() as sess:
+#                 sess['user'] = 'k@gmail.com'
 
 ######################################################################
-# Tests that require an active session, but no database access
+# Tests that require database access, need an active session, and
+# can actually change the database.
 ######################################################################
 
-    def test_homepage_session(self):
-        """ Test homepage when user is logged in."""
-        result = self.client.get("/")
+######################################################################
+# Helper functions to run the tests
+######################################################################
 
 
-class FlaskTestsLoggedIn(TestCase):
-    """Flask tests with user logged in to session."""
+def example_data():
+    """Create some sample data."""
 
-    def setUp(self):
-        """Stuff to do before every test."""
+    # In case this is run more than once, empty out existing data
+    User.query.delete()
+    BannedNews.query.delete()
 
-        app.config['TESTING'] = True
-        app.config['SECRET_KEY'] = 'ABC'
-        self.client = app.test_client()
+    # Add sample employees and departments
+    news1 = BannedNews(news_id=1,
+                       trig_article='This is an examle',
+                       trig_words='rape, war',
+                       date_added=date.today())
+    news2 = BannedNews(news_id=2,
+                       trig_article='This is an examle',
+                       trig_words='assault',
+                       date_added=date.today())
+    news3 = BannedNews(news_id=3,
+                       trig_article='This is an examle',
+                       trig_words='rape, trump',
+                       date_added=date.today())
 
-        with self.client as c:
-            with c.session_transaction() as sess:
-                sess['user'] = 'k@gmail.com'
+    user1 = User(user_id=1,
+                 email='hello@gmail.com',
+                 password='010101',
+                 trig='rape')
+    user2 = User(user_id=2,
+                 email='test@gmail.com',
+                 password='010101',
+                 trig='war')
+    user3 = User(user_id=3,
+                 email='hi@gmail.com',
+                 password='010101',
+                 trig='rape')
 
-    def test_important_page(self):
-        """Test important page."""
-
-        result = self.client.get("/important")
-        self.assertIn(b"You are a valued user", result.data)
+    db.session.add_all([news1, news2, news3, user1, user2, user3])
+    db.session.commit()
 
 
 if __name__ == '__main__':

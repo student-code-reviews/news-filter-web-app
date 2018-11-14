@@ -82,20 +82,29 @@ def example_data():
                        trig_article='This is an examle',
                        trig_words='rape, war',
                        date_added=date.today())
-    news2 = BannedNews(news_id=1,
+    news2 = BannedNews(news_id=2,
                        trig_article='This is an examle',
                        trig_words='assault',
                        date_added=date.today())
-    news3 = BannedNews(news_id=1,
+    news3 = BannedNews(news_id=3,
                        trig_article='This is an examle',
                        trig_words='rape, trump',
                        date_added=date.today())
 
-    user1 = User(name='Leonard', dept=dl)
-    user2 = User(name='Liz', dept=dl)
-    user3 = User(name='Maggie', dept=dm)
+    user1 = User(user_id=1,
+                 email='hello@gmail.com',
+                 password='hello',
+                 trig='rape')
+    user2 = User(user_id=2,
+                 email='test@gmail.com',
+                 password='test',
+                 trig='war')
+    user3 = User(user_id=3,
+                 email='hi@gmail.com',
+                 password='hi',
+                 trig='rape')
 
-    db.session.add_all([df, dl, dm, leonard, liz, maggie, nadine])
+    db.session.add_all([news1, news2, news3, user1, user2, user3])
     db.session.commit()
 
 
