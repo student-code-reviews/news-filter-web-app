@@ -14,6 +14,7 @@ import requests
 # For password hashing
 import bcrypt
 from six import u
+# For date_added column in the bannednews table.
 from datetime import date
 
 newsapi = NewsApiClient(api_key=os.environ.get('MY_KEY_NAME'))
@@ -30,7 +31,7 @@ app.jinja_env.undefined = StrictUndefined
 @app.route('/')
 def index():
     """Homepage."""
-    session.clear()
+    # session.clear()
 # Here, we are checking if the user is logged in (session has 'user' key)
     if 'user' in session:
         user = User.query.filter(User.email == session['user']).one()
