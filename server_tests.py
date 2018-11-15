@@ -38,7 +38,7 @@ class FlaskTests(unittest.TestCase):
     def test_register_page(self):
         result = self.client.get("/register")
         self.assertEqual(result.status_code, 200)
-        self.assertIn(b"<h2>To register, please provide your email address, password and news filtering preferences</h2>", result.data)
+        self.assertIn(b"To register, please provide", result.data)
 
 
 ######################################################################
@@ -154,9 +154,14 @@ class FlaskTestsChangeDB(unittest.TestCase):
         self.assertIn(b"login", result.data)
 
     def test_tagging_news(self):
-        """Test tagging news article and
-        adding it to the database"""
-        pass
+        """Test tagging news article and adding it to the database"""
+        trig_article = "This is a test triggering article."
+        route = "/trig-submitted/<trig_article>/<user_id>"
+        result = self.client.post(route,
+                                  data={'trig_article': trig_article,
+                                        "trig_words": "war",
+                                        'date_added': date.today()})
+        self.assertIn(b"successfully", result.data)
 
 ######################################################################
 # Helper functions to run the tests
@@ -171,16 +176,13 @@ def example_data():
     BannedNews.query.delete()
 
     # Add sample employees and departments
-    news1 = BannedNews(news_id=1,
-                       trig_article='This is an example',
+    news1 = BannedNews(trig_article='This is an example',
                        trig_words='rape, war',
                        date_added=date.today())
-    news2 = BannedNews(news_id=2,
-                       trig_article='This is an example',
+    news2 = BannedNews(trig_article='This is an example',
                        trig_words='assault',
                        date_added=date.today())
-    news3 = BannedNews(news_id=3,
-                       trig_article='This is an example',
+    news3 = BannedNews(trig_article='This is an example',
                        trig_words='rape, trump',
                        date_added=date.today())
     password = hash_password("hello")
