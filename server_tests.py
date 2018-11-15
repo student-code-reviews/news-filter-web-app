@@ -1,10 +1,9 @@
-from project_server import app, hash_password
+from server import app, hash_password
 import unittest
-from project_server import app
 from six import b, u
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from project_model import User, BannedNews, db, connect_to_db
+from model import User, BannedNews, db, connect_to_db
 from datetime import date
 
 ######################################################################
