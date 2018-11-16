@@ -1,11 +1,27 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1>Filtered News</h1>
-<h2>Please login or register to get filtered news</h2>
+<!-- <script src="static/js/components/homepage.jsx" type="text/jsx"></script>
 
-<p><b><a href="/register">Register</a></p>
+    <script src= homepage.jsx type="text/jsx">
+        ReactDOM.render(<Homepage />, document.querySelector('div#root'));
+    </script> -->
+       <!--  <link rel="icon" src="/NewsFilterLogo.png"> -->
 
-<p><b><a href="/login">Log In</a></p>
+    <body class="text-center">
+
+        <form class="form-signin" action = '/logged-in' method='POST'>
+        <img class='mb-4' src="/static/images/updated_logo.png" alt="" width="80" height="80">
+        <h1 class="h3 mb-3 font-weight-normal">Sign in for filtered news</h1>
+        <label for="inputEmail" class="sr-only"></label>
+        <input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>
+        <label for="inputPassword" class="sr-only"></label>
+        <input type="password" name="password" class="form-control" placeholder="Password" required>
+
+        <button class="btn btn-lg btn-info btn-block" type="submit">Sign in</button>
+        <a href="/register"><button type="button" class="btn btn-link">Register</button></a>
+        </form>
+    </body>
+
 
 {% endblock %}

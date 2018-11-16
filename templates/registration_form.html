@@ -1,9 +1,30 @@
 {% extends 'base.html' %}
 {% block content %}
+<!--
+  <h2>To register, please provide your email address, password and news filtering preferences</h2> -->
+      <body class="text-center">
 
-  <h2>To register, please provide your email address, password and news filtering preferences</h2>
+        <form class="form-signin" action = '/register' method='POST'>
+        <img class='mb-4' src="/static/images/updated_logo.png" alt="" width="80" height="80">
+        <h1 class="h3 mb-3 font-weight-normal">Register here</h1>
+        <label for="inputEmail" class="sr-only"></label>
+        <input type="email" name="email" class="form-control" placeholder="Email address" required autofocus>
+        <label for="inputPassword" class="sr-only"></label>
+        <input type="password" name="password" class="form-control" placeholder="Password" required>
+        Trigger words:<br>
+        <input type = "checkbox" name = "trig_word" value="rape" >Rape <br>
+        <input type = "checkbox" name = "trig_word" value="war">War <br>
+        <input type = "checkbox" name = "trig_word" value="assault">Assault <br>
+        <input type = "checkbox" name = "trig_word" value="trump">Trump <br>
+        Other:<input type ='text' name = "trig_word"><br><br>
 
-  <form action = '/register' method='POST' >
+        <button class="btn btn-lg btn-info btn-block" type="submit">Register</button>
+    </form>
+    </body>
+
+
+
+<!--   <form action = '/register' method='POST' >
     Email address:<br>
     <input type="email" name="email" required>
     <br>
@@ -37,5 +58,4 @@ Article Tite: {{trig_article}}
         <input type = 'checkbox' name="trig_words" value="trump">Tr**p<br><br>
 
       <input type="submit" value="Submit">
-    </form>
-
+    </form> -->
