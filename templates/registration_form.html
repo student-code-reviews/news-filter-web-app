@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+  <!-- Custom styles for this template -->
+<link href="/static/css/signin.css" rel="stylesheet">
 {% block content %}
 <!--
   <h2>To register, please provide your email address, password and news filtering preferences</h2> -->
@@ -22,40 +24,4 @@
     </form>
     </body>
 
-
-
-<!--   <form action = '/register' method='POST' >
-    Email address:<br>
-    <input type="email" name="email" required>
-    <br>
-    Password:<br>
-    <input type="password" name="password" required>
-    <br><br>
-    Trigger words:<br>
-      <input type = "checkbox" name = "trig_word" value="rape" >Ra** <br>
-      <input type = "checkbox" name = "trig_word" value="war">War <br>
-      <input type = "checkbox" name = "trig_word" value="crash">Cr**h <br>
-      <input type = "checkbox" name = "trig_word" value="assault">Ass**lt <br>
-      <input type = "checkbox" name = "trig_word" value="trump">Tr**p <br>
-      Other:<br>
-        <input type = 'text' name = "trig_word" ><br>
-    </select>
-    <br><br>
-    <input type="submit" value="Submit">
-  </form>
-
 {% endblock %}
-
-
-
-Article Tite: {{trig_article}}
-        <form action = '/trig-submitted/{{trig_article}}/{{user_id}}' method='POST' >
-        Please select associated triggering tag:<br>
-        <input type = 'checkbox' name="trig_words" value="rape">R**e<br>
-        <input type = 'checkbox' name="trig_words" value="war">War<br>
-        <input type = 'checkbox' name="trig_words" value="crash">Cr**h<br>
-        <input type = 'checkbox' name="trig_words" value="assault">As***lt<br>
-        <input type = 'checkbox' name="trig_words" value="trump">Tr**p<br><br>
-
-      <input type="submit" value="Submit">
-    </form> -->

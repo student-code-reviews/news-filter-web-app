@@ -33,7 +33,7 @@ def index():
     # session.clear()
 # Here, we are checking if the user is logged in (session has 'user' key)
     if 'user' in session:
-        user = User.query.filter(User.email == session['user']).one()
+        user = User.query.filter(User.email == session['user']).first()
         user_id = int(user.user_id)
         return render_template("log_in_homepage.html", user_id=user_id)
     else:
@@ -143,7 +143,8 @@ def update_preferences(user_id):
 @app.route('/news-options/<user_id>')
 def news_options(user_id):
     """ This displays a page with following news options- world, technology, politics, entertainment"""
-    return render_template('news_options.html', user_id=user_id)
+    # return render_template('news_options.html', user_id=user_id)
+    return render_template('news_filter.html', user_id=user_id)
 
 
 # This is where bulk of the back-end work is happening...
@@ -158,6 +159,7 @@ def userpreferences(user_id):
     trig_words = user.trig
 
     # Calling get_articles function that sends an API request.
+    print(news_type, trig_words)
     filtered_articles = get_articles(news_type, trig_words)
 
     if not filtered_articles:
@@ -184,6 +186,7 @@ def get_articles(news_type, trig_words):
                     'sports': 'espn.com'}
 
     domains = news_options[news_type]
+
     trig_words_str = ''
     for trig_word in trig_words:
         trig_words_str += trig_word + ', '
@@ -196,6 +199,7 @@ def get_articles(news_type, trig_words):
                                           language='en')
 
     # This is a list of articles objects from the json response returned.
+    print(all_articles)
     articles = all_articles['articles']
     return filtering_news(articles)
 

@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
+  <!-- Custom styles for this template -->
+<link href="/static/css/news.css" rel="stylesheet">
 {% block content %}
 
   <h2>News options</h2>
   <p>
-    <form action=" /filtered-news/{{user_id}}" method="POST">
+    <form action="/filtered-news/{{user_id}}" method="POST">
         <input type="radio" name="option" value="world">World
         <input type="radio" name="option" value="technology">Technology
         <input type="radio" name="option" value="politics">Politics
@@ -14,9 +16,29 @@
         <button type="submit">Read News!</button>
     </form>
   </p>
-  <footer>
+
+<!--   <footer>
     <a href='/user-preferences/{{user_id}}'>Update User Preferences</a>
     <br><br>
-    <a href='/logout'>Logout</a></footer>
-{% endblock %}
+    <a href='/logout'>Logout</a></footer> -->
 
+
+<!-- <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">World</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Technology</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Politics</a>
+  </li>
+</ul>
+<div class="tab-content" id="pills-tabContent">
+  <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">...</div>
+  <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">...</div>
+  <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>
+</div> -->
+
+
+{% endblock %}
