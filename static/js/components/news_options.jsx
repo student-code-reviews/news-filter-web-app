@@ -9,9 +9,11 @@ class NewsOptions extends React.Component {
   <li class="nav-item">
     <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab">Profile</a>
   </li>
-  <li class="nav-item">
-    <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab">Contact</a>
-  </li>
+  <form action="/hello">
+    <li class="nav-item">
+      <button class="nav-link" id="pills-contact-tab" data-toggle="pill" role="tab" type="submit">Contact</button>
+    </li>
+  </form>
 </ul>
 
 

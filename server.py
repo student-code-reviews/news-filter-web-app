@@ -147,7 +147,13 @@ def news_options(user_id):
     return render_template('news_filter.html', user_id=user_id)
 
 
+@app.route('/hello')
+def hello():
+    return render_template('login.html')
+
 # This is where bulk of the back-end work is happening...
+
+
 @app.route('/filtered-news/<user_id>', methods=['POST'])
 def userpreferences(user_id):
     """Gets user's preference of news and makes a query to get user's trigger words """
