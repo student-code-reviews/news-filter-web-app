@@ -3,7 +3,7 @@
 # I have used only letter t
 from jinja2 import StrictUndefined
 import os
-from flask import (Flask, render_template, redirect, request, flash, session)
+from flask import (Flask, render_template, redirect, request, flash, session, jsonify)
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import User, BannedNews, connect_to_db, db
@@ -120,12 +120,12 @@ def change_preferences(user_id):
 
 @app.route("/user.json")
 def user_info():
-    """Return information about tuition as JSON."""
+    """Return information about user as JSON."""
     # user = User.query.filter(User.email == session["user"]).first()
     # user_json = {"user_id": user.user_id, "trig_words": user.trig}
-    # print(user_json)
-    return jsonify('hello')
-    # return jsonify(user_json)
+    user_json = {"user_id": 2, "trig_words": "rape"}
+    # return jsonify('hello')
+    return jsonify(user_json)
 
 
 @app.route("/hello")
