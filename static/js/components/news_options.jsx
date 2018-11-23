@@ -1,25 +1,37 @@
+
 class NewsOptions extends React.Component {
+      getUser = () => {
+        fetch('/user.json')
+          .then(response => response.json())
+          .then(data => alert(`The user-id is ${data.user_id}`));
+        }
+
     render() {
+
+
+
     return(
-
-<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-  <li class="nav-item">
-    <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab">Home</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab">Profile</a>
-  </li>
-  <form action="/hello">
-    <li class="nav-item">
-      <button class="nav-link" id="pills-contact-tab" data-toggle="pill" role="tab" type="submit">Contact</button>
-    </li>
-  </form>
-</ul>
-
-
+      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+        <button onClick={this.getUser} className="btn btn-info" name = "option">World</button>
+        <form action="/hello">
+            <button className="btn btn-info" type="submit">Politics</button>
+        </form>
+        <form action="/hello">
+            <button className="btn btn-info" type="submit">Technology</button>
+        </form>
+        <form action="/hello">
+            <button className="btn btn-info" type="submit">Sports</button>
+        </form>
+        <form action="/hello">
+            <button className="btn btn-info" type="submit">Entertainment</button>
+        </form>
+      </nav>
 
       );
   }
 }
 
-ReactDOM.render(<NewsOptions />, document.querySelector(" #root"));
+
+ReactDOM.render(<NewsOptions />, document.querySelector("div#root"));
+
+

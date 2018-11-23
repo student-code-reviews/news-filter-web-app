@@ -37,7 +37,8 @@ def index():
         user_id = int(user.user_id)
         return render_template("log_in_homepage.html", user_id=user_id)
     else:
-        return render_template("homepage.html")
+        return render_template("news_filter.html", user_id=2)
+        # return render_template("homepage.html")
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -117,6 +118,21 @@ def change_preferences(user_id):
     return render_template('user_preferences.html', user_id=user_id, trig_words=trig_words)
 
 
+@app.route("/user.json")
+def user_info():
+    """Return information about tuition as JSON."""
+    # user = User.query.filter(User.email == session["user"]).first()
+    # user_json = {"user_id": user.user_id, "trig_words": user.trig}
+    # print(user_json)
+    return jsonify('hello')
+    # return jsonify(user_json)
+
+
+@app.route("/hello")
+def hello():
+    return "namaste"
+
+
 @app.route('/preferences-updated/<user_id>', methods=['POST'])
 def update_preferences(user_id):
     """ Preferences for the user are updated in the database"""
@@ -147,9 +163,9 @@ def news_options(user_id):
     return render_template('news_filter.html', user_id=user_id)
 
 
-@app.route('/hello')
-def hello():
-    return render_template('login.html')
+# @app.route('/hello')
+# def hello():
+#     return render_template('login.html')
 
 # This is where bulk of the back-end work is happening...
 
